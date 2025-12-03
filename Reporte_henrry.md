@@ -209,9 +209,9 @@ El proyecto utilizó un dataset público de radiografías de tórax, compuesto p
 
 # 8. Contribución del Equipo
 
-- **Henrry Uribe Cabrera Ordoñez:** desarrollo completo de notebooks, análisis de datos, extracción de características, entrenamiento y evaluación de modelos.  
-- **Laura Sanín Colorado:** preprocesamiento de imágenes, análisis exploratorio y documentación de resultados.  
-- **Juan Manuel Sanchez Restrepo:** implementación de clasificadores tradicionales, ajuste de parámetros y generación de gráficos de desempeño.  
+- **Henrry Uribe Cabrera Ordoñez:** Reporte, Análisis de datos, extracción de características, entrenamiento y evaluación de modelos.  
+- **Laura Sanín Colorado:** preprocesamiento de imágenes, análisis exploratorio y documentación de resultados y reporte.  
+- **Juan Manuel Sanchez Restrepo:** implementación de clasificadores tradicionales, ajuste de parámetros y generación de gráficos de desempeño, entrenamiento y evalucion del modelo.  
 - **Sebastián Palacio Betancur:** implementación de Transfer Learning con ResNet, evaluación de modelos de deep learning y comparación con modelos tradicionales.
 
 > Todos los integrantes participaron activamente en la discusión de resultados, redacción del informe final y revisión del contenido técnico.
