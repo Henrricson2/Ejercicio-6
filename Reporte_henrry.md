@@ -163,7 +163,7 @@ Se desarrolló una **función integral de extracción de características**, cap
 
 ---
 
-# 4. Experimentos y Resultados
+# 4. Experimentos
 
 ## 4.1. Descriptores Tradicionales
 SVM y Random Forest destacaron como los modelos con mayor rendimiento.  
@@ -214,12 +214,44 @@ Además, capturó patrones texturales y estructurales que no son fácilmente rep
 
 ---
 
+
 # 6. Conclusiones
 
 - El preprocesamiento es un componente esencial debido a la heterogeneidad del dataset.  
 - Los descriptores tradicionales permitieron la construcción de clasificadores funcionales, aunque con limitaciones evidentes.  
 - La ResNet empleada mediante Transfer Learning mostró mejor desempeño en todas las métricas evaluadas.  
 - El pipeline desarrollado es reproducible, modular y escalable para investigaciones futuras.
+
+## 6.1. Dominio de Deep Learning
+- El modelo **ResNet Transfer (DL)** lidera el desempeño general:
+  - **Accuracy:** 83.65%
+  - **Recall:** 98.7%
+  - **F1-Score:** 88.3%
+  - **AUC-ROC:** 0.945
+- Esto indica que clasifica correctamente la mayoría de los casos y detecta casi todos los positivos.
+- Los modelos de Deep Learning capturan patrones complejos de los datos, ofreciendo un equilibrio superior entre precisión y sensibilidad.
+
+## 6.2.  Competencia de los modelos tradicionales
+- **k-NN** es el más competitivo entre los tradicionales:
+  - **Accuracy:** 79%
+  - **F1-Score:** 80.7%
+- **Random Forest** sigue con:
+  - **Accuracy:** 73%
+  - **F1-Score:** 76.5%
+- Observación: estos métodos presentan **Recall alto pero Precision más baja**, identificando bien los positivos pero generando más falsos positivos.
+- Modelos como **Naive Bayes, SVM y Logistic Regression** tienen desempeño moderado (**Accuracy 64-70%**) y son útiles en escenarios de menor complejidad o recursos limitados.
+
+## 6.3. Modelos con desempeño limitado
+- **Gradient Boosting** presenta los valores más bajos:
+  - **Accuracy:** 59%
+  - **F1-Score:** 69%
+- Indica dificultad para capturar la complejidad de los datos.
+
+## 6.4. Tendencias generales y recomendaciones
+- **Deep Learning** es ideal para maximizar rendimiento y equilibrio entre métricas.
+- **Métodos tradicionales** pueden ser útiles para pruebas rápidas o entornos con limitaciones computacionales.
+- La elección del modelo depende del **trade-off entre recursos y necesidad de precisión/sensibilidad**.
+- **Recomendación:** usar **ResNet Transfer** cuando los recursos lo permitan, por su rendimiento superior en todas las métricas clave.
 
 ---
 
