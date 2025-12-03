@@ -1,197 +1,215 @@
-# Clasificación Automática de Neumonía en Radiografías de Tórax: Descriptores Tradicionales y Deep Learning
+# Clasificación Automática de Neumonía en Radiografías de Tórax
+## Basada en descriptores tradicionales y modelos de Deep Learning
 
 ---
 
 # 1. Introducción
 
-La identificación temprana y precisa de patologías pulmonares mediante radiografías de tórax es esencial para un diagnóstico clínico efectivo. La interpretación manual depende fuertemente de la experiencia del radiólogo y puede verse limitada por:
+La identificación temprana y precisa de patologías pulmonares mediante radiografías de tórax es un componente fundamental del diagnóstico clínico. La interpretación manual depende fuertemente de la experiencia del especialista y puede verse limitada en instituciones con alta demanda, escasez de radiólogos o variabilidad interobservador.  
 
-- Alta demanda de estudios.  
-- Escasez de especialistas.  
-- Variabilidad interobservador.  
+Los sistemas de apoyo al diagnóstico basados en visión por computador ofrecen una alternativa para aumentar la precisión y estandarizar interpretaciones.  
 
-Los sistemas de apoyo al diagnóstico basados en visión por computador permiten aumentar la precisión, estandarizar interpretaciones y asistir en decisiones clínicas.
+Este proyecto aborda la **clasificación binaria de radiografías** (normales vs neumonía), usando:
 
-**Objetivo del proyecto:** Clasificar automáticamente radiografías en dos clases: **normales** y **con neumonía**, comparando enfoques basados en:
+1. **Descriptores tradicionales** (HOG, LBP, Haralick, Zernike) + modelos clásicos de ML.  
+2. **Modelos profundos preentrenados** (ResNet con Transfer Learning).  
 
-1. **Descriptores tradicionales** (HOG, LBP, Haralick, Zernike) con modelos clásicos de Machine Learning.  
-2. **Deep Learning** mediante **ResNet Transfer Learning**.
+Objetivo: comparar ambos enfoques, evaluando desempeño, ventajas, limitaciones y potencial de generalización.
 
 ---
 
 # 2. Marco Teórico
 
-## 2.1. Preprocesamiento de Imágenes
+## 2.1. Preprocesamiento de Imágenes Médicas
 
-El preprocesamiento es crítico para garantizar que los modelos funcionen correctamente:
+- **Redimensionamiento:** uniformidad de dimensiones.  
+- **Escala de grises:** reduce dimensionalidad manteniendo información clínica.  
+- **Normalización:** homogeneiza intensidades entre imágenes.  
+- **CLAHE:** mejora contraste local evitando amplificación de ruido.  
 
-- **Redimensionamiento:** unifica dimensiones para procesamiento vectorial.  
-- **Escala de grises:** reduce dimensionalidad sin perder información relevante.  
-- **Normalización:** estabiliza intensidades entre imágenes.  
-- **CLAHE:** mejora contraste local y evita sobre-amplificación del ruido.  
-- **Augmentation** (recomendado para Deep Learning): rotaciones, flips y zoom para robustecer modelos frente a variabilidad de adquisición.
-
-Estas técnicas aseguran consistencia para descriptores tradicionales y CNN, y reducen el riesgo de overfitting.
+Estas técnicas permiten consistencia y comparabilidad entre descriptores tradicionales y redes neuronales.
 
 ---
 
 ## 2.2. Descriptores Tradicionales
 
-### ✔ HOG — *Histogram of Oriented Gradients*  
-Detecta gradientes locales y bordes, útil para estructuras anatómicas.
-
-### ✔ LBP — *Local Binary Patterns*  
-Captura microtexturas robustas ante cambios de iluminación, caracterizando patrones pulmonares.
-
-### ✔ Haralick (GLCM)  
-Extrae atributos de textura (contraste, homogeneidad, correlación).
-
-### ✔ Momentos de Zernike  
-Descriptores invariantes a rotación, útiles para formas globales anómalas.
+- **HOG:** captura gradientes locales, ideal para bordes y estructuras anatómicas.  
+- **LBP:** describe microtexturas robustas a cambios de iluminación.  
+- **Haralick / GLCM:** atributos de homogeneidad, contraste y correlación.  
+- **Momentos de Zernike:** invariantes a rotación, capturan información global de forma.  
 
 ---
 
-## 2.3. Clasificadores Tradicionales
+## 2.3. Métodos de Clasificación
 
-- **SVM**  
-- **Random Forest**  
-- **Gradient Boosting**  
-- **k-NN**  
-- **Regresión Logística**  
-
-**Nota:** Todos requieren vectores de características previamente construidos y ajuste de hiperparámetros (GridSearchCV).
+- **SVM**, **Random Forest**, **XGBoost**, **k-NN**, **Regresión Logística**.  
+- Todos requieren vectores de características construidos previamente.
 
 ---
 
-## 2.4. Deep Learning — ResNet Transfer Learning
+## 2.4. Deep Learning — Transfer Learning
 
-- Red convolucional profunda preentrenada en ImageNet.  
-- Capas finales ajustadas para clasificación binaria (normal vs neumonía).  
-- **Skip connections** permiten aprendizaje de representaciones profundas sin degradación.  
-- Capacidad para detectar patrones complejos de textura y estructura sin ingeniería manual de características.
+- **ResNet preentrenada en ImageNet**.  
+- Capas convolucionales como extractor de características + capas finales ajustadas a clasificación binaria.  
+- *Skip connections* permiten aprender representaciones complejas sin degradación.
 
 ---
 
 # 3. Metodología
 
-El pipeline se estructuró en tres notebooks principales:
+Pipeline en tres notebooks:
+
+---
 
 ## 3.1. Notebook 01 — Exploratory Analysis & Cleaning
 
-**Actividades:**
+- Carga dataset: 5,856 imágenes.  
+- Evaluación tamaños, contraste y nitidez.  
+- Preprocesamiento: escala de grises, redimensionamiento, normalización y CLAHE.  
+- Conclusiones preliminares sobre calidad de imágenes.
 
-1. Carga del dataset (5.856 imágenes).  
-2. Evaluación de distribución de tamaños y resolución.  
-3. Visualización de muestras para contraste y nitidez.  
-4. Preprocesamiento: escala de grises, redimensionamiento, normalización y CLAHE.  
-5. Conclusiones preliminares sobre calidad y homogeneidad de imágenes.
+**Observaciones Clave:**
 
-**Resultados Clave:**
+- **Contraste y textura:** neumonía → zonas homogéneas/densas; normal → mayor detalle.  
+- **Distribución de intensidades:** KDE/CDF muestran diferencias consistentes.  
+- **Intensidad promedio y variabilidad:** mayor en neumonía, mayor dispersión entre imágenes afectadas.  
 
-- Diferencias de contraste y textura entre clases.  
-- Distribución de intensidades: neumonía más concentrada en valores medios; normal más dispersa.  
-- KDEs y CDFs muestran patrones consistentes entre clases.  
-- Intensidad promedio y variabilidad: mayor en neumonía.  
-
-> ![Ejemplo de análisis exploratorio](ruta/de/la/imagen.png)
+> ![Ejemplo Exploratory Analysis](ruta/de/la/imagen_exploratory.png)
 
 ---
 
 ## 3.2. Notebook 02 — Feature Extraction
 
-- Extracción de **HOG, LBP, Haralick y Zernike**.  
-- Ajuste fino de parámetros (bloques, radios, ventanas).  
-- Almacenamiento en vectores listos para modelado.  
-- Total de características: hasta 26.244 dimensiones, reducidas posteriormente con técnicas de selección de características (Feature Selection).
+- **26,244 dimensiones de características** extraídas.  
+- Captura gradientes, bordes, texturas y geometría pulmonar.
+
+### HOG
+- Detecta costillas, columna, contornos pulmonares.  
+- Valores normalizados: -7.58 a 10.  
+
+> ![Ejemplo HOG](ruta/de/la/imagen_HOG.png)
+
+### Momentos de Hu y Geometría
+- Área: 22,372 px, Perímetro: 4,243  
+- Excentricidad: 0.57, Solidez: 0.60, Relación de aspecto: 1.10  
+
+### LBP
+- Textura local robusta a iluminación  
+- Diferencia tejido sano vs patológico  
+
+> ![Ejemplo LBP](ruta/de/la/imagen_LBP.png)
+
+### GLCM
+- 60 dimensiones  
+- Contraste: 9.52, Disimilitud: 1.89, Homogeneidad: 0.49  
+
+### Filtros Gabor
+- Detectan patrones según frecuencia/orientación  
+- Capturan estructuras anatómicas y detalles finos
+
+### Estadísticas básicas
+- Media: 0.52, SD: 0.24, Varianza: 0.058  
+- Skewness: -0.26, Kurtosis: -0.92, Entropía: -43.78  
+
+**Conclusión:** conjunto de características robusto y diferenciador.
+
+> ![Resumen de extracción de características](ruta/de/la/imagen_resumen.png)
 
 ---
 
 ## 3.3. Notebook 03 — Classification
 
-**Actividades:**
-
-1. División train/test (80/20).  
-2. Estandarización de características.  
-3. Entrenamiento y optimización de modelos clásicos.  
-4. Entrenamiento de **CNN y ResNet Transfer**.  
-5. Evaluación con métricas completas: Accuracy, Precision, Recall, F1-Score, AUC-ROC.  
-6. Análisis de **overfitting** mediante CV_F1 vs Test F1.  
-7. Comparación de enfoques tradicionales vs Deep Learning.
+- División train/test, estandarización, entrenamiento clasificadores, GridSearchCV.  
+- Evaluación: matriz de confusión, precision, recall, F1, ROC/AUC.  
+- Comparación modelos tradicionales vs ResNet.  
+- Análisis de importancia de características.
 
 ---
 
-# 4. Resultados
+# 4. Experimentos
 
 ## 4.1. Descriptores Tradicionales
+- SVM y Random Forest destacan.  
+- Sensibilidad moderada, dependiente de preprocesamiento y ruido.
 
-| Modelo | Accuracy | F1-Score | Test AUC | Overfitting |
-|--------|---------|----------|----------|------------|
-| k-NN | 0.79 | 0.807 | 0.8726 | 0.113 |
-| Random Forest | 0.73 | 0.765 | 0.8626 | 0.149 |
-| Naive Bayes | 0.70 | 0.750 | 0.7674 | 0.155 |
-| SVM | 0.66 | 0.734 | 0.8864 | 0.217 |
-| Logistic Regression | 0.64 | 0.723 | 0.8772 | 0.228 |
-| Gradient Boosting | 0.59 | 0.692 | 0.704 | 0.141 |
-
-**Observaciones:**  
-- k-NN y Random Forest muestran buen equilibrio entre desempeño y generalización.  
-- Modelos lineales como SVM y Logistic Regression tienden a sobreajustar.  
-- Gradient Boosting tiene desempeño limitado ante la complejidad del dataset.
+## 4.2. Deep Learning — ResNet
+- Mejor F1-score y generalización.  
+- Captura patrones complejos sin ingeniería manual.
 
 ---
 
-## 4.2. Deep Learning — ResNet Transfer
+# 5. Análisis y Discusión
 
-| Modelo | Accuracy | Recall | F1-Score | AUC-ROC |
-|--------|---------|--------|----------|---------|
-| ResNet Transfer | 0.8365 | 0.987 | 0.883 | 0.9446 |
-| SimpleCNN | 0.697 | 0.979 | 0.802 | 0.8488 |
+**Comparación:**
 
-**Observaciones:**  
-- ResNet Transfer logra el **mejor desempeño global**.  
-- SimpleCNN tiene muy alto recall pero menor precisión, indicando sobrepredicción de positivos.  
-- Deep Learning captura patrones complejos de forma automática.
+| Enfoque         | Ventajas                     | Limitaciones                            |
+|-----------------|------------------------------|----------------------------------------|
+| Tradicional     | Interpretables, menor dataset | Sensible a ruido/contraste, costoso computacional |
+| Deep Learning   | Robustez, aprende patrones complejos | Requiere recursos, menor interpretabilidad directa |
 
----
+**Limitaciones generales:**
+- Sin augmentations fuertes  
+- Alta variabilidad visual  
+- Falta validación externa  
+- Sensible a desbalance  
 
-# 5. Comparación de Modelos
-
-## 5.1. Rendimiento General
-
-- **Mejor modelo absoluto:** ResNet Transfer (DL).  
-- **Tradicionales confiables:** k-NN y Random Forest.  
-- **Modelos con desempeño limitado:** Gradient Boosting, combinaciones de descriptores seleccionados.
-
-## 5.2. Recomendaciones Prácticas
-
-- Para máxima precisión y sensibilidad: **ResNet Transfer**.  
-- Para pruebas rápidas o con recursos limitados: **k-NN o Random Forest**.  
-- Considerar balanceo de clases y augmentations en Deep Learning.  
-- La selección de características puede reducir dimensionalidad, pero no garantiza mejor desempeño.
+**Posibles mejoras:**
+- Fine-tuning completo de ResNet  
+- Incremento de dataset  
+- Augmentations realistas  
+- Ensemble DL + tradicionales  
+- Validación cruzada k-fold
 
 ---
 
-# 6. Discusión
+# 6. Conclusiones y Resultados
 
-- Preprocesamiento y análisis exploratorio son esenciales para diferenciar clases y evitar ruido.  
-- Deep Learning supera a modelos clásicos en casi todas las métricas.  
-- Tradicionales aún útiles en escenarios de bajo recurso o para interpretabilidad.  
-- Mejoras futuras: ensemble de CNN + descriptores, fine-tuning de ResNet, validación cruzada k-fold y augmentations.
+## 6.1. Preprocesamiento
+- Fundamental para homogeneidad del dataset y calidad de extracción de características.
+
+## 6.2. Descriptores tradicionales
+- Funcionan, pero limitados ante variabilidad anatómica y contraste.
+
+## 6.3. Deep Learning
+- ResNet Transfer Learning supera métricas clásicas, aprendizaje robusto sin ingeniería manual.
+
+## 6.4. Diferencias de contraste y textura
+- Neumonía: zonas densas y homogéneas  
+- Normal: más detalle y uniformidad
+
+## 6.5. Distribución de intensidades
+- KDE y CDF confirman patrones consistentes entre clases
+
+## 6.6. Feature Extraction
+- HOG, LBP, GLCM, Hu, Gabor robustos  
+- Estadísticas básicas reflejan buena discriminación
+
+## 6.7. Rendimiento de modelos
+
+**Deep Learning — ResNet Transfer**
+
+| Métrica      | Valor       |
+|-------------|------------|
+| Accuracy    | 83.65%     |
+| Recall      | 98.7%      |
+| F1-Score    | 88.3%      |
+| AUC-ROC     | 0.945      |
+
+**Modelos tradicionales**
+
+| Modelo       | Accuracy | F1-Score |
+|-------------|----------|----------|
+| k-NN        | 79%      | 80.7%    |
+| RandomForest| 73%      | 76.5%    |
+| Otros       | 64-70%   | 69-75%   |
+
+**Recomendaciones:**  
+- Usar ResNet Transfer si recursos lo permiten  
+- Tradicionales útiles para escenarios de baja complejidad o recursos limitados
 
 ---
 
-# 7. Conclusiones
-
-1. **Preprocesamiento**: esencial para consistencia y reducción de ruido.  
-2. **Descriptores tradicionales**: funcionales, pero limitados frente a la complejidad de las imágenes.  
-3. **Deep Learning (ResNet Transfer)**: mejor desempeño y generalización.  
-4. **Pipeline reproducible y escalable** para nuevos datasets de radiografías.  
-5. **Análisis estadístico y métricas** permiten identificar patrones clave y diferenciar clases automáticamente.  
-6. **k-NN y Random Forest**: balance de desempeño y robustez en escenarios con recursos limitados.
-
----
-
-# 8. Referencias (APA)
+# 7. Referencias (APA)
 
 - Dalal, N., & Triggs, B. (2005). *Histograms of oriented gradients for human detection*. CVPR.  
 - Ojala, T., Pietikäinen, M., & Mäenpää, T. (2002). *Multiresolution gray-scale and rotation invariant texture classification with local binary patterns*. IEEE TPAMI.  
@@ -201,11 +219,6 @@ El pipeline se estructuró en tres notebooks principales:
 
 ---
 
-# 9. Contribución Individual
+# 8. Contribución Individual
 
-- Preprocesamiento completo de imágenes (CLAHE, grises, redimensionamiento).  
-- Extracción de características HOG, LBP, Haralick y Zernike.  
-- Entrenamiento, optimización y evaluación de clasificadores clásicos y ResNet Transfer.  
-- Análisis exploratorio, interpretación de resultados y visualizaciones.  
-- Elaboración del pipeline reproducible y documentación del proyecto.
-
+- Henrry: desarrollo completo de notebooks, análisis de datos, extracción de características y evaluación de modelos.
