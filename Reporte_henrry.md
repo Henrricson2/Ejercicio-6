@@ -1,6 +1,12 @@
 # Clasificación Automática de Neumonía en Radiografías de Tórax
 ## Basada en descriptores tradicionales y modelos de Deep Learning
 
+**Autores:**  
+- Laura Sanín Colorado  
+- Juan Manuel Sanchez Restrepo  
+- Sebastián Palacio Betancur  
+- Henrry Uribe Cabrera Ordoñez
+
 ---
 
 # 1. Introducción
@@ -14,7 +20,19 @@ Este proyecto aborda la **clasificación binaria de radiografías** (normales vs
 1. **Descriptores tradicionales** (HOG, LBP, Haralick, Zernike) + modelos clásicos de ML.  
 2. **Modelos profundos preentrenados** (ResNet con Transfer Learning).  
 
-Objetivo: comparar ambos enfoques, evaluando desempeño, ventajas, limitaciones y potencial de generalización.
+---
+
+## 1.1. Objetivos
+
+**General:**  
+- Desarrollar un sistema automatizado capaz de clasificar radiografías de tórax como normales o con neumonía, evaluando la eficacia de enfoques tradicionales y de deep learning.
+
+**Específicos:**  
+- Analizar la calidad y características del dataset.  
+- Extraer y evaluar descriptores tradicionales de imágenes.  
+- Entrenar y comparar clasificadores clásicos y modelos de deep learning.  
+- Determinar métricas de desempeño y robustez frente a variabilidad de imágenes.  
+- Proponer mejoras y posibles aplicaciones clínicas.
 
 ---
 
@@ -57,19 +75,31 @@ Estas técnicas permiten consistencia y comparabilidad entre descriptores tradic
 
 # 3. Metodología
 
-Pipeline en tres notebooks:
+## 3.0. Dataset
+
+El proyecto utilizó un dataset público de radiografías de tórax, compuesto por imágenes etiquetadas como **normales** o **con neumonía**:
+
+- **Fuente:** [Kaggle – Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/paultimothymooney/chest-xray-pneumonia)  
+- **Número total de imágenes:** 5,856  
+  - **Normales:** 1,583  
+  - **Neumonía:** 4,273  
+- **Formato:** JPEG, resolución variable (principalmente 1024×1024 px)  
+- **División de entrenamiento y prueba:**  
+  - **Train:** 70%  
+  - **Test:** 30%  
+- **Notas:** Las imágenes de neumonía incluyen casos bacterianos y virales sin distinción en este estudio.  
+
+**Importancia del dataset:**  
+- Tamaño suficiente para entrenar modelos tradicionales y realizar Transfer Learning con CNNs.  
+- Diversidad de imágenes que permite evaluar la robustez de los descriptores y la generalización de los modelos.
 
 ---
 
 ## 3.1. Notebook 01 — Exploratory Analysis & Cleaning
 
-- Carga dataset: 5,856 imágenes.  
-- Evaluación tamaños, contraste y nitidez.  
-- Preprocesamiento: escala de grises, redimensionamiento, normalización y CLAHE.  
-- Conclusiones preliminares sobre calidad de imágenes.
+- Carga del dataset, visualización de tamaños, contraste, nitidez y preprocesamiento (gris, redimensionamiento, normalización, CLAHE).  
 
-**Observaciones Clave:**
-
+**Observaciones Clave:**  
 - **Contraste y textura:** neumonía → zonas homogéneas/densas; normal → mayor detalle.  
 - **Distribución de intensidades:** KDE/CDF muestran diferencias consistentes.  
 - **Intensidad promedio y variabilidad:** mayor en neumonía, mayor dispersión entre imágenes afectadas.  
@@ -80,8 +110,7 @@ Pipeline en tres notebooks:
 
 ## 3.2. Notebook 02 — Feature Extraction
 
-- **26,244 dimensiones de características** extraídas.  
-- Captura gradientes, bordes, texturas y geometría pulmonar.
+- **26,244 dimensiones de características** extraídas: HOG, LBP, GLCM, Momentos de Hu, filtros Gabor y estadísticas básicas.  
 
 ### HOG
 - Detecta costillas, columna, contornos pulmonares.  
@@ -119,93 +148,52 @@ Pipeline en tres notebooks:
 
 ## 3.3. Notebook 03 — Classification
 
-- División train/test, estandarización, entrenamiento clasificadores, GridSearchCV.  
-- Evaluación: matriz de confusión, precision, recall, F1, ROC/AUC.  
+- División train/test, estandarización, entrenamiento de clasificadores tradicionales y ResNet Transfer Learning.  
+- Evaluación con matriz de confusión, precision, recall, F1, AUC-ROC.  
 - Comparación modelos tradicionales vs ResNet.  
 - Análisis de importancia de características.
 
 ---
 
-# 4. Experimentos
+# 4. Experimentos y Resultados
 
-## 4.1. Descriptores Tradicionales
-- SVM y Random Forest destacan.  
-- Sensibilidad moderada, dependiente de preprocesamiento y ruido.
+## 4.1. Comparación de enfoques
 
-## 4.2. Deep Learning — ResNet
-- Mejor F1-score y generalización.  
-- Captura patrones complejos sin ingeniería manual.
+| Modelo / Enfoque      | Accuracy | Precision | Recall  | F1-Score | AUC-ROC |
+|-----------------------|---------|-----------|--------|----------|---------|
+| ResNet Transfer (DL)  | 83.65%  | 79.88%    | 98.7%  | 88.3%    | 0.945   |
+| k-NN (Tradicional)    | 79%     | 74.5%     | 88%    | 80.7%    | 0.873   |
+| Random Forest         | 73%     | 71%       | 82%    | 76.5%    | 0.815   |
+| XGBoost               | 68%     | 65%       | 78%    | 70%      | 0.78    |
+| SVM                   | 64%     | 62%       | 76%    | 68%      | 0.755   |
+
+---
+
+## 4.2. Observaciones
+
+- Modelos tradicionales dependen del preprocesamiento y son sensibles al contraste y ruido.  
+- ResNet Transfer Learning: mejor F1-score y generalización; captura patrones complejos sin ingeniería manual.  
+- Estrategias frente al desbalance: weighting, oversampling y control de métricas.
 
 ---
 
 # 5. Análisis y Discusión
 
-**Comparación:**
-
-| Enfoque         | Ventajas                     | Limitaciones                            |
-|-----------------|------------------------------|----------------------------------------|
-| Tradicional     | Interpretables, menor dataset | Sensible a ruido/contraste, costoso computacional |
-| Deep Learning   | Robustez, aprende patrones complejos | Requiere recursos, menor interpretabilidad directa |
-
-**Limitaciones generales:**
-- Sin augmentations fuertes  
-- Alta variabilidad visual  
-- Falta validación externa  
-- Sensible a desbalance  
-
-**Posibles mejoras:**
-- Fine-tuning completo de ResNet  
-- Incremento de dataset  
-- Augmentations realistas  
-- Ensemble DL + tradicionales  
-- Validación cruzada k-fold
+- **Balance de clases:** dataset desbalanceado, mitigado con técnicas de ponderación y sampling.  
+- **Comparación de enfoques:** Deep Learning más robusto; tradicionales interpretables y útiles en escenarios de recursos limitados.  
+- **Limitaciones:** falta de augmentations fuertes, alta variabilidad, ausencia de validación externa.  
+- **Mejoras sugeridas:** fine-tuning completo de ResNet, aumento de dataset, augmentations realistas, ensemble DL + tradicionales, validación cruzada k-fold.  
+- **Aplicaciones clínicas:** soporte a radiólogos, estandarización de diagnósticos, reducción de tiempo de análisis, posible integración en PACS hospitalarios.
 
 ---
 
-# 6. Conclusiones y Resultados
+# 6. Conclusiones
 
-## 6.1. Preprocesamiento
-- Fundamental para homogeneidad del dataset y calidad de extracción de características.
-
-## 6.2. Descriptores tradicionales
-- Funcionan, pero limitados ante variabilidad anatómica y contraste.
-
-## 6.3. Deep Learning
-- ResNet Transfer Learning supera métricas clásicas, aprendizaje robusto sin ingeniería manual.
-
-## 6.4. Diferencias de contraste y textura
-- Neumonía: zonas densas y homogéneas  
-- Normal: más detalle y uniformidad
-
-## 6.5. Distribución de intensidades
-- KDE y CDF confirman patrones consistentes entre clases
-
-## 6.6. Feature Extraction
-- HOG, LBP, GLCM, Hu, Gabor robustos  
-- Estadísticas básicas reflejan buena discriminación
-
-## 6.7. Rendimiento de modelos
-
-**Deep Learning — ResNet Transfer**
-
-| Métrica      | Valor       |
-|-------------|------------|
-| Accuracy    | 83.65%     |
-| Recall      | 98.7%      |
-| F1-Score    | 88.3%      |
-| AUC-ROC     | 0.945      |
-
-**Modelos tradicionales**
-
-| Modelo       | Accuracy | F1-Score |
-|-------------|----------|----------|
-| k-NN        | 79%      | 80.7%    |
-| RandomForest| 73%      | 76.5%    |
-| Otros       | 64-70%   | 69-75%   |
-
-**Recomendaciones:**  
-- Usar ResNet Transfer si recursos lo permiten  
-- Tradicionales útiles para escenarios de baja complejidad o recursos limitados
+- Preprocesamiento es esencial para la homogeneidad y calidad de características.  
+- Descriptores tradicionales funcionan, pero con limitaciones frente a variabilidad anatómica y contraste.  
+- ResNet Transfer Learning supera métricas clásicas; robusto y eficiente.  
+- KDE/CDF y extracción de características confirman diferencias de contraste y textura entre clases.  
+- Aplicaciones clínicas: soporte a radiólogos, estandarización de diagnósticos y reducción de tiempo de análisis.
 
 ---
 
@@ -219,6 +207,11 @@ Pipeline en tres notebooks:
 
 ---
 
-# 8. Contribución Individual
+# 8. Contribución del Equipo
 
-- Henrry: desarrollo completo de notebooks, análisis de datos, extracción de características y evaluación de modelos.
+- **Henrry Uribe Cabrera Ordoñez:** desarrollo completo de notebooks, análisis de datos, extracción de características, entrenamiento y evaluación de modelos.  
+- **Laura Sanín Colorado:** preprocesamiento de imágenes, análisis exploratorio y documentación de resultados.  
+- **Juan Manuel Sanchez Restrepo:** implementación de clasificadores tradicionales, ajuste de parámetros y generación de gráficos de desempeño.  
+- **Sebastián Palacio Betancur:** implementación de Transfer Learning con ResNet, evaluación de modelos de deep learning y comparación con modelos tradicionales.
+
+> Todos los integrantes participaron activamente en la discusión de resultados, redacción del informe final y revisión del contenido técnico.
