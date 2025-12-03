@@ -94,40 +94,6 @@ La inconsistencia en tamaños y niveles de contraste compromete tanto la extracc
 
 ---
 
-## 1. Diferencias de contraste y textura
-Las imágenes con neumonía tienden a mostrar zonas más homogéneas y densas, debido a la consolidación pulmonar, mientras que las imágenes normales presentan un patrón más uniforme y con mayor detalle de estructuras pulmonares.
-
-Esto se evidencia en los resultados de la ecualización CLAHE, los bordes detectados (Sobel y Laplaciano) y los colormaps, donde los detalles de los pulmones normales son más visibles.
-
----
-
-## 2. Distribución de intensidades
-Las gráficas de densidad (KDE) muestran que las imágenes de neumonía presentan una concentración mayor de píxeles en rangos intermedios de intensidad, reflejando áreas opacas, mientras que las imágenes normales tienen una distribución más dispersa, representando aire y tejido sano.
-
-La CDF confirma que la probabilidad acumulada en los valores más bajos y medios es mayor en las imágenes con neumonía, mostrando diferencias en la iluminación global y opacidad pulmonar.
-
----
-
-## 3. Comparación agregada
-Al superponer los KDEs y CDFs de varios ejemplos, se observa que las diferencias entre las clases son consistentes: las imágenes normales tienden a tener un patrón más “plano” y extendido, mientras que las neumónicas muestran picos pronunciados en ciertas intensidades.
-
-Esto sugiere que estas métricas estadísticas podrían ser útiles para diferenciar clases automáticamente.
-
----
-
-## 4. Intensidad promedio y variabilidad
-Los boxplots indican que la media de intensidad de las imágenes con neumonía suele ser ligeramente mayor que la de las imágenes normales, lo que refleja el incremento de densidad en los pulmones afectados.
-
-También se observa mayor variabilidad entre imágenes con neumonía, lo que puede corresponder a diferentes grados de afectación pulmonar.
-
----
-
-## 5. Importancia del análisis exploratorio
-Estos análisis permiten identificar patrones visuales y estadísticos antes de entrenar modelos de clasificación, asegurando que las diferencias entre clases sean detectables y que el preprocesamiento mejore la discriminación entre imágenes.
-
-![Texto alternativo](ruta/de/la/imagen.extensión)
-
----
 
 ## 3.2. Notebook 02 — Feature Extraction
 
@@ -221,8 +187,43 @@ Además, capturó patrones texturales y estructurales que no son fácilmente rep
 - Los descriptores tradicionales permitieron la construcción de clasificadores funcionales, aunque con limitaciones evidentes.  
 - La ResNet empleada mediante Transfer Learning mostró mejor desempeño en todas las métricas evaluadas.  
 - El pipeline desarrollado es reproducible, modular y escalable para investigaciones futuras.
+  
+## 6.1. Diferencias de contraste y textura
+Las imágenes con neumonía tienden a mostrar zonas más homogéneas y densas, debido a la consolidación pulmonar, mientras que las imágenes normales presentan un patrón más uniforme y con mayor detalle de estructuras pulmonares.
 
-## 6.1. Dominio de Deep Learning
+Esto se evidencia en los resultados de la ecualización CLAHE, los bordes detectados (Sobel y Laplaciano) y los colormaps, donde los detalles de los pulmones normales son más visibles.
+
+---
+
+## 6.2. Distribución de intensidades
+Las gráficas de densidad (KDE) muestran que las imágenes de neumonía presentan una concentración mayor de píxeles en rangos intermedios de intensidad, reflejando áreas opacas, mientras que las imágenes normales tienen una distribución más dispersa, representando aire y tejido sano.
+
+La CDF confirma que la probabilidad acumulada en los valores más bajos y medios es mayor en las imágenes con neumonía, mostrando diferencias en la iluminación global y opacidad pulmonar.
+
+---
+
+## 6.3. Comparación agregada
+Al superponer los KDEs y CDFs de varios ejemplos, se observa que las diferencias entre las clases son consistentes: las imágenes normales tienden a tener un patrón más “plano” y extendido, mientras que las neumónicas muestran picos pronunciados en ciertas intensidades.
+
+Esto sugiere que estas métricas estadísticas podrían ser útiles para diferenciar clases automáticamente.
+
+---
+
+## 6.4. Intensidad promedio y variabilidad
+Los boxplots indican que la media de intensidad de las imágenes con neumonía suele ser ligeramente mayor que la de las imágenes normales, lo que refleja el incremento de densidad en los pulmones afectados.
+
+También se observa mayor variabilidad entre imágenes con neumonía, lo que puede corresponder a diferentes grados de afectación pulmonar.
+
+---
+
+## 6.5. Importancia del análisis exploratorio
+Estos análisis permiten identificar patrones visuales y estadísticos antes de entrenar modelos de clasificación, asegurando que las diferencias entre clases sean detectables y que el preprocesamiento mejore la discriminación entre imágenes.
+
+![Texto alternativo](ruta/de/la/imagen.extensión)
+
+---
+
+## 6.6. Dominio de Deep Learning
 - El modelo **ResNet Transfer (DL)** lidera el desempeño general:
   - **Accuracy:** 83.65%
   - **Recall:** 98.7%
@@ -231,7 +232,7 @@ Además, capturó patrones texturales y estructurales que no son fácilmente rep
 - Esto indica que clasifica correctamente la mayoría de los casos y detecta casi todos los positivos.
 - Los modelos de Deep Learning capturan patrones complejos de los datos, ofreciendo un equilibrio superior entre precisión y sensibilidad.
 
-## 6.2.  Competencia de los modelos tradicionales
+## 6.7.  Competencia de los modelos tradicionales
 - **k-NN** es el más competitivo entre los tradicionales:
   - **Accuracy:** 79%
   - **F1-Score:** 80.7%
@@ -241,13 +242,13 @@ Además, capturó patrones texturales y estructurales que no son fácilmente rep
 - Observación: estos métodos presentan **Recall alto pero Precision más baja**, identificando bien los positivos pero generando más falsos positivos.
 - Modelos como **Naive Bayes, SVM y Logistic Regression** tienen desempeño moderado (**Accuracy 64-70%**) y son útiles en escenarios de menor complejidad o recursos limitados.
 
-## 6.3. Modelos con desempeño limitado
+## 6.8. Modelos con desempeño limitado
 - **Gradient Boosting** presenta los valores más bajos:
   - **Accuracy:** 59%
   - **F1-Score:** 69%
 - Indica dificultad para capturar la complejidad de los datos.
 
-## 6.4. Tendencias generales y recomendaciones
+## 6.9. Tendencias generales y recomendaciones
 - **Deep Learning** es ideal para maximizar rendimiento y equilibrio entre métricas.
 - **Métodos tradicionales** pueden ser útiles para pruebas rápidas o entornos con limitaciones computacionales.
 - La elección del modelo depende del **trade-off entre recursos y necesidad de precisión/sensibilidad**.
